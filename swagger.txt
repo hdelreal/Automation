@@ -1,0 +1,1003 @@
+swagger: '2.0'
+info:
+  description: This API documentation is for GBR Technologies clients
+  version: 2.0.0
+  title: GBR TECHNOLOGIES
+  # put the contact info for your development or API team
+  contact:
+    email: hector.delreal@gbr-tech.com
+# host: "http://cliente.gbr-tech.com/api2"
+# basePath: "/v2"
+
+tags:
+- name: "verification"
+  description: "Related to device(s) verification upon login"
+- name: "token"
+  description: "Related to token authentication (Created for future queries)"
+- name: "admin"
+  description: "Related to account administrative tasks"
+- name: "distributor"
+  description: "Tools for distributor use"
+- name: "geofence"
+  description: "For geofence related functions"
+- name: "removevehicles"
+  description: "Related to removing vehicles from account"
+- name: "reports"
+  description: "For interacting with reporting related functions"
+- name: "unit"
+  description: "For interacting with unit related functions"
+- name: "user"
+  description: "Related to user accound manipulation"
+- name: "vehicle"
+  description: "For interacting with vehicle related functions"
+
+paths:
+  /vehicle/active-installed:
+    get:
+      tags:
+      - "vehicle"
+      summary: "Retrieve only those vehicles that are active in the account which have a unit associated with them."
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+        - name: "token"
+          in: "query"
+          description: "Parameter taken from TokenCreation process"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+      
+  /vehicle/name:
+    get:
+      tags:
+      - "vehicle"
+      summary: "Retrieves the name of the user the unit belongs to."
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+        - name: "token"
+          in: "query"
+          description: "Parameter taken from TokenCreation process"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+  /vehicle/report:
+    get:
+      tags:
+      - "vehicle"
+      summary: "Retrieves report for vehicles. LIMITS: Each report has a limit of 5 vehicles except for the Exceptions, Inactive, Activations, and Command History Reports. The date range of duration per report can be a maximum of 30 days."
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: "reportType"
+        in: "query"
+        description: "The report type to make and retrieve. The commands are 'History' for History Report, 'Exception' for Exception Report, 'Inventory' for Inventory Report, 'Recent' for Recent Location Report, 'InActive' for Inactive Report, 'Activations' for Activations Report, 'Top10' for Top Locations Report, 'Command' for Command History Report, 'Loaner' for Loaner Report, 'Geofence' for Geofence Report, 'Alerts' for Alerts Report, 'OnOffLot' for OnLot/OffLot Report, 'DrivingStatistics' for the Driving Statistics Report."
+        required: true
+        type: 'string'
+      - name: "esn"
+        in: "query"
+        description: "Array of ESNs of the vehicles for the report. Required for 'Recent Locations', 'History', 'Alerts','Top Location', and 'Loaner Report'. Otherwise, this parameter is optional"
+        type: 'array'
+        items:
+          type: "string"
+      - name: "duration"
+        in: "query"
+        description: "Required parameter for some reports."
+        type: 'string'
+        default: "-1"
+      - name: "dateRange"
+        in: "query"
+        description: "Date range of the report. This parameter is required for reports like 'DrivingStatistics', 'HistoryReport','Exceptions','AlertReport','Activations','Geofence','DrivingBehaior'. \nFormat: 09/15/2021 12:00 AM - 09/22/2021 11:59 PM"
+        type: 'string'
+        
+      - name: "token"
+        in: "query"
+        description: "Parameter taken from TokenCreation process"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+  /vehicle/vin:
+    get:
+      tags:
+      - "vehicle"
+      summary: "Retrieves vehicle information from the VIN."
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: 'vin'
+        in: 'query'
+        description: "Vehicle's VIN (serial number)"
+        required: true
+        type: 'string'
+      - name: "token"
+        in: "query"
+        description: "Parameter taken from TokenCreation process"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+  /admin/alert:
+    post:
+      tags:
+      - "admin"
+      summary: "Add or Edit Speeding, Low Battery, Power Disconnect, Geofence, or Inactive Alerts"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: 'buttonType'
+        in: 'query'
+        description: "If adding a Alert use 'add' or if editing use 'edit'"
+        required: true
+        type: "string"
+          
+      - name: 'alertType'
+        in: 'query'
+        description: "The alert being added/edited. It can be 'speeding' for Speeding, 'powerdis' for PowerDisconnect, 'lowbat' for Low Battery, 'inactive' for Inactive, 'geofence' for Geofence"
+        required: true
+        type: 'string'
+      - name: 'email'
+        in: 'query'
+        description: "Email to be sent when there is an alert"
+        required: true
+        type: 'string'
+      - name: 'unitid'
+        in: 'query'
+        description: "ID of the desired unit"
+        required: true
+        type: 'string'
+      - name: 'name'
+        in: 'query'
+        description: "Name given to the alert created"
+        required: true
+        type: 'string'
+      - name: 'duration'
+        in: 'query'
+        description: "Duration of seconds when speed limit is reached/passed to send an alert. REQUIRED FOR ADDING/EDITING SPEED ALERT"
+        type: 'string'
+      - name: 'limit'
+        in: 'query'
+        description: "Speed limit given to the alert"
+        type: 'string'
+      - name: 'days'
+        in: 'query'
+        description: "Days the vehicle is inactive. REQUIRED FOR INACTIVE ALERT"
+        type: 'string'
+      - name: 'landmark'
+        in: 'query'
+        description: "Landmark UUID"
+        type: 'string'
+      - name: 'start'
+        in: 'query'
+        description: "Start time of geofence alert. REQUIRED FOR GEOFENCE ALERT"
+        type: 'string'
+      - name: 'end'
+        in: 'query'
+        description: "End time of geofence alert. REQUIRED FOR GEOFENCE ALERT"
+        type: 'string'
+      - name: 'arriveDepart'
+        in: 'query'
+        description: "For arrival of a vehicle into a landmark use 'Arrival. For departure of a vehicle from a landmark use 'Departure'"
+        type: 'string'
+      - name: "token"
+        in: "query"
+        description: "Parameter taken from TokenCreation process"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+  /admin/batdis:
+    get:
+      tags:
+      - "admin"
+      summary: "Retrieves all scheduled battery disconnect alerts"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+        - name: "token"
+          in: "query"
+          description: "Parameter taken from TokenCreation process"
+          required: true
+          type: "string"
+      responses:
+          "200":
+            description: "successful operation"
+          "400":
+            description: "Invalid status value"
+  /admin/remove-alert:
+    post:
+      tags:
+      - "admin"
+      summary: "Deletes a Speeding, Low Battery, Power Disconnect, Geofence, or Inactive Alert"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+        - name: 'id'
+          description: "ID of the alert to remove"
+          in: 'query'
+          required: true
+          type: 'string'
+        - name: 'alertType'
+          description: "The alert type can be 'speeding for speeding, 'powerdis' for PowerDisconnect, 'lowbat' for Low Battery, 'inactive' for Inactive, 'geofence' for Geofence"
+          in: 'query'
+          required: true
+          type: 'string'
+        - name: "token"
+          in: "query"
+          description: "Parameter taken from TokenCreation process"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+  /admin/speeding:
+    get:
+      tags:
+      - "admin"
+      summary: "Retrieves all scheduled speeding alerts"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+        - name: "token"
+          in: "query"
+          description: "Parameter taken from TokenCreation process"
+          required: true
+          type: "string"
+      responses:
+          "200":
+            description: "successful operation"
+          "400":
+            description: "Invalid status value" 
+  /admin/updatevehicle:
+    post:
+      tags:
+      - "admin"
+      summary: "Updates the vehicle's name, make, model, color, year, miles, VIN, license plate, and loaner status"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+        - name: "id"
+          in: "query"
+          type: "string"
+          required: true
+          description: "Vehicle ID (22 alphanumeric characters)"
+        - name: "vName"
+          in: "query"
+          type: "string"
+          required: true
+          description: "Vehicle's name"
+        - name: "make"
+          in: "query"
+          type: "string"
+          required: true
+          description: "Vehicle's brand/make"
+        - name: "model"
+          in: "query"
+          type: "string"
+          required: true
+          description: "Vehicle's model"
+        - name: "year"
+          in: "query"
+          type: "string"
+          required: true
+          description: "Vehicle's year"
+        - name: "color"
+          in: "query"
+          type: "string"
+          required: true
+          description: "Vehicle's color"
+        - name: "vin"
+          in: "query"
+          type: "string"
+          required: true
+          description: "Vehicle's VIN (Serial number)"
+        - name: "plate"
+          in: "query"
+          type: "string"
+          required: true
+          description: "Vehicle´s license plate"
+        - name: "miles"
+          in: "query"
+          type: "string"
+          required: true
+          description: "Vehicle's miles quantity"
+        - name: "loaner"
+          in: "query"
+          type: "string"
+          required: true
+          description: "Is Vehicle a loaner? \nTrue/False"
+        - name: "landmarkId"
+          in: "query"
+          type: "string"
+          description: "If vehicle is a loaner it will need a LandamarkID (22 characters) set as it's home"
+        - name: "features"
+          in: "query"
+          type: "string"
+          description: "Array of vehicle features.Features are: \nDISABLE\nWARNINGON\nWARNINGOFF\nOPENDOORS\nSTARTENGINE\nCARFIND"
+        - name: "token"
+          in: "query"
+          description: "Parameter taken from TokenCreation process"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Succesful operation"
+        "400":
+          description: "Invalid status value"
+  /admin/vehicleinfo:
+    get:
+      tags:
+      - "admin"
+      summary: "Retrieves the vehicle and unit information for a given VehicleID"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+        - name: "id"
+          in: "query"
+          type: "string"
+          required: true
+          description: "The vehicleID (22 characters)"
+        - name: "token"
+          in: "query"
+          description: "Parameter taken from TokenCreation process"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Succesful operation"
+        "400":
+          description: "Invalid status value"
+  /distributor/details-by-vin:
+    get:
+      tags:
+      - "distributor"
+      summary: "Retrieves vehicle details by VIN (For distributors)"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+        - name: "vin"
+          in: "query"
+          type: "string"
+          description: "VIN number to pass in to retrieve vehicle details with"
+          required: true
+        - name: "distributor_token"
+          in: "query"
+          type: "string"
+          description: "Distributor token assigned by organizations/entity making the request"
+          required: true
+        - name: "token"
+          in: "query"
+          description: "Parameter taken from TokenCreation process"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Succesful operation"
+        "400":
+          description: "Invalid status value"
+  /geofence/landmarks:
+    get:
+      tags:
+      - "geofence"
+      summary: "Retrieves a list of all the user's landmarks"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+        - name: "token"
+          in: "query"
+          description: "Parameter taken from TokenCreation process"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Succesful operation"
+        "400":
+          description: "Invalid status value"
+  /removevehicles/remove-vehicles:
+    post:
+      tags:
+      - "removevehicles"
+      summary: "Add or edit speeding, low battery, power disconnect, Geofence or inactive Alerts"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+        - name: "vehicles"
+          in: "query"
+          type: "array"
+          items:
+            type: "string"
+          required: true
+          description: "Array of vehicle's ID"
+        - name: "firstname"
+          in: "query"
+          type: "string"
+          required: true
+          description: "User's first name"
+        - name: "lastname"
+          in: "query"
+          type: "string"
+          required: true
+          description: "User's last name"
+        - name: "email"
+          in: "query"
+          type: "string"
+          required: true
+          description: "User's email"
+        - name: "type"
+          in: "query"
+          type: "string"
+          description: "Reason for removing the vehicle. The params are: \nsold\nremoved\ntrade"
+        - name: "token"
+          in: "query"
+          description: "Parameter taken from TokenCreation process"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Succesful operation"
+        "400":
+          description: "Invalid status value"
+  /reports/scheduled:
+    get:
+      tags: 
+      - "reports"
+      summary: "Gets all scheduled reports"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+        - name: "token"
+          in: "query"
+          description: "Parameter taken from TokenCreation process"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Succesful operation"
+        "400":
+          description: "Invalid status value"
+  /token/create:
+    post:
+      tags:
+      - "token"
+      summary: "Creates a token for the User's account"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: "username"
+        in: "query"
+        type: "string"
+        description: "User's username"
+        required: true
+      - name: "password"
+        in: "query"
+        type: "string"
+        description: "User's password"
+        required: true
+      - name: "device_id"
+        type: "string"
+        description: "User's device ID. Generated in Verification process"
+        in: "query"
+        required: true
+      responses:
+        "200":
+          description: "Succesful operation"
+        "400":
+          description: "Invalid status value"
+    get:
+      tags:
+      - "token"
+      summary: "Retrieves User's token"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: "username"
+        in: "query"
+        type: "string"
+        description: "User's username"
+        required: true
+      - name: "password"
+        in: "query"
+        type: "string"
+        description: "User's password"
+        required: true
+      - name: "device_id"
+        type: "string"
+        description: "User's device ID. Generated in Verification process"
+        in: "query"
+        required: true
+      responses:
+        "200":
+          description: "Succesful operation"
+        "400":
+          description: "Invalid status value"
+  /unit/activate:
+    post:
+      tags:
+      - "unit"
+      summary: "Add a vehicle with a unit attached to a user's account"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: "esn"
+        in: "query"
+        type: "string"
+        description: "Unit's ESN (serial number)"
+        required: true
+      - name: "vehicleName"
+        in: "query"
+        type: "string"
+        description: "Vehicle's name, given by user"
+      - name: "make"
+        in: "query"
+        type: "string"
+        description: "Vehicle's brand/make"
+        required: true
+      - name: "model"
+        in: "query"
+        type: "string"
+        description: "Vehicle's model"
+        required: true
+      - name: "year"
+        in: "query"
+        type: "string"
+        description: "Vehicle's year"
+        required: true
+      - name: "color"
+        in: "query"
+        type: "string"
+        description: "Vehicle's color"
+        required: true
+      - name: "vin"
+        in: "query"
+        type: "string"
+        description: "Vehicle's VIN (serial number)"
+        required: true
+      - name: "licensePlate"
+        in: "query"
+        type: "string"
+        description: "Vehicle's license plate"
+      - name: "trim"
+        in: "query"
+        type: "string"
+        description: "Vehicle's trim"
+      - name: "engine"
+        in: "query"
+        type: "string"
+        description: "Vehicle's engine"
+      - name: "vehicleNotes"
+        in: "query"
+        type: "string"
+        description: "Write notes for this vehicle"
+      - name: "firstName"
+        in: "query"
+        type: "string"
+        description: "User's first name. \nOnly required for Surepay accounts"
+      - name: "lastName"
+        in: "query"
+        type: "string"
+        description: "User's last name. \nOnly required for Surepay accounts"
+      - name: "city"
+        in: "query"
+        type: "string"
+        description: "User's city. \nOnly required for Surepay accounts"
+      - name: "state"
+        in: "query"
+        type: "string"
+        description: "User's state. \nOnly required for Surepay accounts"
+      - name: "zip"
+        in: "query"
+        type: "string"
+        description: "User's zip code. \nOnly required for Surepay accounts"
+      - name: "email"
+        in: "query"
+        type: "string"
+        description: "User's email. \nOnly required for Surepay accounts"
+      - name: "phone"
+        in: "query"
+        type: "string"
+        description: "User's phone number. \nOnly required for Surepay accounts"
+      - name: "token"
+        in: "query"
+        description: "Parameter taken from TokenCreation process"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"
+  /unit/command:
+    get:
+      tags:
+      - "unit"
+      summary: "Send a command to a unit. Attempts to execute the given command for the unit." 
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: "esn"
+        in: "query"
+        type: "string"
+        description: "Unit's esn to send a command"
+        required: true
+      - name: "command"
+        in: "query"
+        type: "string"
+        description: "Command to send to the unit. Example: \nLocateUnit\nEnableStarter\nDisableStarter\nWarningOn\nWarningOff\nOpenDoors\nStartEngine\nCarFind\nActivateUnit\nVIPOn\nVIPOff"
+        required: true
+      - name: "token"
+        in: "query"
+        description: "Parameter taken from TokenCreation process"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"
+  /unit/info:
+    get:
+      tags:
+      - "unit"
+      summary: "Retrieves the unit and vehicle (if vehicle is attached to unit) information" 
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: "esn"
+        in: "query"
+        type: "string"
+        description: "Unit's ESN (serial number)"
+        required: true
+      - name: "token"
+        in: "query"
+        description: "Parameter taken from TokenCreation process"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"
+  /unit/inventory:
+    get:
+      tags:
+      - "unit"
+      summary: "Retrieves the number of installed devices and devices available" 
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+        - name: "token"
+          in: "query"
+          description: "Parameter taken from TokenCreation process"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"
+  /unit/inventory-list:
+    get:
+      tags:
+      - "unit"
+      summary: "Retrieves all the ESNs in the user's inventory" 
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: "token"
+        in: "query"
+        description: "Parameter taken from TokenCreation process"
+        required: true
+        type: "string"  
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"
+  /unit/most-recent:
+    get:
+      tags:
+      - "unit"
+      summary: "Retrieves the unit and vehicle (if vehicle is attached to unit) information" 
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: "esn"
+        in: "query"
+        type: "string"
+        description: "Unit's ESN (serial number)"
+        required: true
+      - name: "token"
+        in: "query"
+        description: "Parameter taken from TokenCreation process"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"  
+  /unit/sent-messages:
+    get:
+      tags:
+      - "unit"
+      summary: "Retrieves all the ESNs in the user's inventory" 
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: "token"
+        in: "query"
+        description: "Parameter taken from TokenCreation process"
+        required: true
+        type: "string"  
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"
+  /unit/unit-transfer:
+    post:
+      tags:
+      - "unit"
+      summary: "Transfer units to another user account. If the unit doesn't have a vehicle attached to it then the unit will be transfer to the user's inventory" 
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: "esn"
+        in: "query"
+        type: "array"
+        items:
+          type: "string"
+        description: "Array of unit ESNs (serial number)"
+        required: true
+      - name: "account"
+        in: "query"
+        type: "string"
+        description: "Username of the account to transfer the units to"
+        required: true
+      - name: "token"
+        in: "query"
+        description: "Parameter taken from TokenCreation process"
+        required: true
+        type: "string"  
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"
+  /unit/units:
+    get:
+      tags:
+      - "unit"
+      summary: "Retrieves all the ESNs in the user's inventory" 
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: "token"
+        in: "query"
+        description: "Parameter taken from TokenCreation process"
+        required: true
+        type: "string"  
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"
+  /user/create:
+    post:
+      tags:
+      - "user"
+      summary: "Create a user account and an inventory account" 
+      produces:
+      - "application/xml"
+      - "application/jason"
+      parameters:
+      - name: "first_name"
+        in: "query"
+        type: "string"
+        description: "User's first name"
+        required: true
+      - name: "last_name"
+        in: "query"
+        type: "string"
+        description: "User's last name"
+        required: true
+      - name: "address"
+        in: "query"
+        type: "string"
+        description: "User's address"
+        required: true
+      - name: "city"
+        in: "query"
+        type: "string"
+        description: "User's city"
+        required: true
+      - name: "state"
+        in: "query"
+        type: "string"
+        description: "User's state"
+        required: true
+      - name: "zip"
+        in: "query"
+        type: "string"
+        description: "User's zip code"
+        required: true
+      - name: "country"
+        in: "query"
+        type: "string"
+        description: "User's country. Example:\nUS\nMX"
+        required: true
+      - name: "timezone"
+        in: "query"
+        type: "string"
+        description: "User's timezone. Example:\nEST"
+        required: true
+      - name: "locale"
+        in: "query"
+        type: "string"
+        description: "Full name of user's country. Example: \nUSA\nMEXICO\nCANADA"
+        required: true
+      - name: "account_username"
+        in: "query"
+        type: "string"
+        description: "User's desired username"
+        required: true
+      - name: "account_password"
+        in: "query"
+        type: "string"
+        description: "User's desired password"
+        required: true
+      - name: "home_phone"
+        in: "query"
+        type: "string"
+        description: "User's home phone number"
+        required: true
+      - name: "cell_phone"
+        in: "query"
+        type: "string"
+        description: "User's cell phone number"
+        required: true
+      - name: "email"
+        in: "query"
+        type: "string"
+        description: "User´s email"
+        required: true
+      - name: "dealership_name"
+        in: "query"
+        type: "string"
+        description: "Dealership/Company name"
+        required: true
+      - name: "token"
+        in: "query"
+        description: "Parameter taken from TokenCreation process"
+        required: true
+        type: "string"  
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"
+  /verification/device-id:
+    get:
+      tags:
+      - "verification"
+      summary: "Creates a device ID"
+      produces:
+      - "application/xml"
+      - "application/jason"
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"
+  /verification/login-code:
+    post:
+      tags:
+      - "verification"
+      summary: "Requests a verification code via the given protocol for the given device"
+      parameters:
+      - name: "username"
+        in: "query"
+        type: "string"
+        description: "User's username"
+        required: true
+      - name: "password"
+        in: "query"
+        type: "string"
+        description: "User's password"
+        required: true
+      - name: "device_id"
+        in: "query"
+        type: "string"
+        description: "User's device ID. Taken from '/verification/device-id'"
+        required: true
+      - name: "protocol"
+        in: "query"
+        type: "string"
+        description: "The protocol to receive the code through. Protocols are: \nsms\nemail"
+        required: true
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"
+  /verification/login:
+    post:
+      tags:
+      - "verification"
+      summary: "Attempts to submit a verification code for the given device"
+      parameters:
+      - name: "username"
+        in: "query"
+        type: "string"
+        description: "User's username"
+        required: true
+      - name: "password"
+        in: "query"
+        type: "string"
+        description: "User's password"
+        required: true
+      - name: "device_id"
+        in: "query"
+        type: "string"
+        description: "User's device ID. Taken from '/verification/device-id'"
+        required: true
+      - name: "verification_code"
+        in: "query"
+        type: "string"
+        description: "The verification code to check. Taken from /verification/login-code"
+        required: true
+      responses:
+        200:
+          description: "Succesful operation"
+        400:
+          description: "Invalid status value"
+    
+#Added by API Auto Mocking Plugin
+host: cliente.gbr-tech.com
+basePath: /api2
+schemes:
+- http
