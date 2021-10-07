@@ -2,6 +2,7 @@ Steps for running TestExercises:
 
 I used Selenium with Python, in which I followed this next rules:
     - I created methods to do specific jobs.
+        
         -TestExercise1.py: Web page is open. Web browser is in full screen.
             TO RUN: Uncomment last code line. Open a command line in
             directory in which this file is stored and type python TestExercise1.py
