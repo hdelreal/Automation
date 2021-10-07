@@ -36,3 +36,5 @@ I used selectors like:
 
 Selenium with python is an easy language to use. We don't need to specify every step
 in code. But, might be a disadvantage because it is no compiled
+
+Changed the extension of readme
